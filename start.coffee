@@ -63,6 +63,10 @@ connect = ->
 		console.log publicKeyPem
 		publicKey = ursa.createPublicKey publicKeyPem, 'utf8'
 		con.on 'data', dataListener
+	
+	con.on 'end', ->
+		console.log 'Server Disconnected'
+		process.exit 1
 
 
 
