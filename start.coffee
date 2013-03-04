@@ -87,7 +87,7 @@ async.waterfall [
 		# Send the key
 		con.write publicKey.encrypt key
 		console.log "Connection Established"
-		menu = new Menu con, key
+		menu = new Menu con, key, server
 		menu.start()
 		callback null
 ]
