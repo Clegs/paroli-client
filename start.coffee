@@ -8,6 +8,8 @@ ursa = require 'ursa'
 async = require 'async'
 crypto = require 'crypto'
 
+Menu = require './menu'
+
 # Get the next line from the console and call 'callback' with the line
 # as the argument.
 getLine = (callback) ->
@@ -84,8 +86,9 @@ async.waterfall [
 	(callback) ->
 		# Send the key
 		con.write publicKey.encrypt key
-		sendEnc "Hello World!"
-		console.log 'Sent'
+		console.log "Connection Established"
+		menu = new Menu con, key
+		menu.start()
 		callback null
 ]
 
