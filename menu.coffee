@@ -30,6 +30,12 @@ class Menu
 		out = Buffer.concat [buf1, buf2]
 		@con.write out
 	
+	getEnc: (callback) =>
+		decipher = crypto.createDecipher 'aes256', @key
+		@con.once 'data', (d) =>
+			data = decipher.update(d) + decipher.final()
+			callback data
+	
 	prompt: =>
 		again = true
 
@@ -111,11 +117,13 @@ class Menu
 				logindata.user = name
 				logindata.password = passwordHash
 				@sendEnc JSON.stringify(logindata)
-				doneCallback null
-				callback null
+				@getEnc (data) =>
+					response = JSON.parse data
+					if(response.success)
+						@user = name
+					doneCallback null
+					callback null
 		]
-		
-
 
 
 module.exports = Menu
