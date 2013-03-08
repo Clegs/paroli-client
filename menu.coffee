@@ -31,9 +31,11 @@ class Menu
 		@con.write out
 	
 	getEnc: (callback) =>
-		decipher = crypto.createDecipher 'aes256', @key
 		@con.once 'data', (d) =>
-			data = decipher.update(d) + decipher.final()
+			console.log d
+			decipher = crypto.createDecipher 'aes256', @key
+			data = "#{decipher.update d}"
+			console.log data
 			callback data
 	
 	prompt: =>
