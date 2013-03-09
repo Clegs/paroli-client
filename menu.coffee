@@ -17,6 +17,7 @@ getLine = (callback) ->
 class Menu
 	constructor: (@con, @key, @server) ->
 		@user = "[anonymous]"
+		@loggedin = false
 		@enc = new Encryption @key
 	
 	# Take over the interface and start listening for data.
@@ -60,6 +61,7 @@ class Menu
 				@printHelp()
 				doneProcessing()
 			when "login" then @login doneProcessing, args[1..]
+			when "logout" then @logout doneProcessing, args[1..]
 			else
 				console.log "Unknown command. For help type 'help'"
 				doneProcessing()
@@ -69,6 +71,7 @@ class Menu
 			Commands:
 			exit - Exit the prompt and disconnect.
 			login - Login to the server.
+			logout - Logout of the server but maintain connection.
 			new - Creates a new user account.
 			help - Prints this help page.
 			"""
@@ -128,6 +131,7 @@ class Menu
 					response = @enc.decObj data
 					if response.success
 						@user = name
+						@loggedin = true
 					else
 						console.error "Login failed."
 					
@@ -139,6 +143,23 @@ class Menu
 				doneCallback null
 				callback null
 		]
+
+	logout: (doneCallback, args) =>
+		if @loggedin
+			# Send a logout command to the server
+			@con.write @enc.encObj {command: "logout"}
+			@con.once 'data', (data) =>
+				response = @enc.decObj data
+				if response.success
+					@loggedin = false
+					@user = "[anonymous]"
+				else
+					console.log response.message
+				doneCallback()
+
+		else
+			console.log "Not currently logged in."
+
 
 
 module.exports = Menu
