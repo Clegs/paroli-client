@@ -107,10 +107,12 @@ class Menu
 				logindata.password = passwordHash
 				@con.write @enc.encObj logindata
 				@con.once 'data', (data) =>
-					console.log "Got: #{data}"
 					response = @enc.decObj data
-					console.log "Response: #{JSON.stringify response}"
-					@user = name
+					if response.success
+						@user = name
+					else
+						console.error "Login failed."
+
 					callback null
 			(callback) =>
 				doneCallback null
