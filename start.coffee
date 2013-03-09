@@ -25,8 +25,6 @@ getData = (con, callback, encoding) ->
 	con.once 'data', (data) ->
 		callback data
 
-user = "user"
-pass = "pass"
 server = "localhost"
 port = 6743
 con = null
@@ -42,16 +40,6 @@ sendEnc = (data) ->
 
 async.waterfall [
 	(callback) ->
-		process.stdout.write "User: (#{user}) "
-		getLine (line) ->
-			user = line if line
-			callback null
-	(callback) ->
-		process.stdout.write "Password: (#{pass}) "
-		getLine (line) ->
-			pass = line if line
-			callback null
-	(callback) ->
 		process.stdout.write "Server: (#{server}) "
 		getLine (line) ->
 			server = line if line
@@ -64,7 +52,7 @@ async.waterfall [
 	(callback) ->
 		# Connect to the server
 		con = net.connect port, server, ->
-			console.log "Client Connected!"
+			# console.log "Client Connected!"
 
 		con.on 'end', ->
 			console.log "Server Disconnected"
@@ -72,7 +60,7 @@ async.waterfall [
 
 		getData con, (data) ->
 			publicKeyPem = data
-			console.log publicKeyPem
+			# console.log publicKeyPem
 			publicKey = ursa.createPublicKey publicKeyPem, 'utf8'
 			callback null
 		, 'utf8'
@@ -81,7 +69,7 @@ async.waterfall [
 		crypto.randomBytes 256/8, (ex, buf) ->
 			throw ex if ex
 			key = buf
-			console.log "Key: #{key}"
+			# console.log "Key: #{key}"
 			callback null
 	(callback) ->
 		# Send the key

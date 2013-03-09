@@ -16,7 +16,7 @@ getLine = (callback) ->
 
 class Menu
 	constructor: (@con, @key, @server) ->
-		@user = "nobody"
+		@user = "[anonymous]"
 		@enc = new Encryption @key
 	
 	# Take over the interface and start listening for data.
@@ -54,8 +54,8 @@ class Menu
 		
 		switch args[0]
 			when "exit"
-				@con.end true
-				doneProcessing()
+				@con.end()
+				doneProcessing true
 			when "help"
 				@printHelp()
 				doneProcessing()
