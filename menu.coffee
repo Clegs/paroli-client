@@ -32,23 +32,37 @@ class Menu
 				getLine (line) ->
 					callback null, line
 			(line, callback) =>
-				switch line
-					when "exit"
-						again = false
-						@con.end()
-						callback null
-					when "help"
-						@printHelp()
-						callback null
-					when "login" then @login(callback)
-					else
-						console.log "Unknown command. For help type 'help'"
-						callback null
-				#callback null
+				@processInput line, (stop) =>
+					if stop then again = false
+					callback null
 			(callback) =>
 				@prompt() if again
 				callback null
 		]
+	
+	processInput: (input, doneProcessing) =>
+		args = input.split ' '
+		for arg in args
+			arg = arg.trim()
+		
+		# Remove emptpy arguments
+		args.splice index, 1 for index, value of args when not value
+		
+		unless args.length
+			doneProcessing()
+			return
+		
+		switch args[0]
+			when "exit"
+				@con.end true
+				doneProcessing()
+			when "help"
+				@printHelp()
+				doneProcessing()
+			when "login" then @login doneProcessing, args[1..]
+			else
+				console.log "Unknown command. For help type 'help'"
+				doneProcessing()
 
 	printHelp: =>
 		console.log """
@@ -79,17 +93,23 @@ class Menu
 				
 		]
 	
-	login: (doneCallback) =>
+	login: (doneCallback, args) =>
 		name = null
 		password = null
 		passwordHash = null
 
+		if args.length >= 1
+			name = args[0]
+
 		async.waterfall [
 			(callback) =>
-				process.stdout.write "Username: "
-				getLine (line) =>
-					name = line
+				if name
 					callback null
+				else
+					process.stdout.write "Username: "
+					getLine (line) =>
+						name = line
+						callback null
 			(callback) =>
 				process.stdout.write "Password: "
 				getLine (line) =>
