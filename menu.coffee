@@ -4,6 +4,7 @@
 
 crypto = require 'crypto'
 async = require 'async'
+Encryption = require './encryption'
 
 getLine = (callback) ->
 	process.stdin.resume()
@@ -18,25 +19,11 @@ getLine = (callback) ->
 class Menu
 	constructor: (@con, @key, @server) ->
 		@user = "nobody"
+		@enc = new Encryption @key
 	
 	# Take over the interface and start listening for data.
 	start: =>
 		@prompt()
-		
-	sendEnc: (data) =>
-		cipher = crypto.createCipher 'aes256', @key
-		buf1 = new Buffer cipher.update(data), 'binary'
-		buf2 = new Buffer cipher.final(), 'binary'
-		out = Buffer.concat [buf1, buf2]
-		@con.write out
-	
-	getEnc: (callback) =>
-		@con.once 'data', (d) =>
-			console.log d
-			decipher = crypto.createDecipher 'aes256', @key
-			data = "#{decipher.update d}"
-			console.log data
-			callback data
 	
 	prompt: =>
 		again = true
@@ -118,13 +105,16 @@ class Menu
 				logindata.command = "login"
 				logindata.user = name
 				logindata.password = passwordHash
-				@sendEnc JSON.stringify(logindata)
-				@getEnc (data) =>
-					response = JSON.parse data
-					if(response.success)
-						@user = name
-					doneCallback null
+				@con.write @enc.encObj logindata
+				@con.once 'data', (data) =>
+					console.log "Got: #{data}"
+					response = @enc.decObj data
+					console.log "Response: #{JSON.stringify response}"
+					@user = name
 					callback null
+			(callback) =>
+				doneCallback null
+				callback null
 		]
 
 
