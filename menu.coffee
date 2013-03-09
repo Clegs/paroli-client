@@ -12,8 +12,6 @@ getLine = (callback) ->
 	process.stdin.once 'data', (line) ->
 		process.stdin.pause()
 		callback line.trim()
-	
-
 
 
 class Menu
@@ -112,6 +110,9 @@ class Menu
 						@user = name
 					else
 						console.error "Login failed."
+					
+					if response.message?
+						console.log response.message
 
 					callback null
 			(callback) =>
