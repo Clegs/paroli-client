@@ -1,6 +1,6 @@
 ###
- start.coffee - Starts a sample client to interact with the paroli server
- and test its features.
+	start.coffee - Starts a sample client to interact with the paroli server
+	and test its features.
 ###
 
 net = require 'net'
