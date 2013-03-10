@@ -104,6 +104,12 @@ class Menu
 		if args.length >= 1
 			name = args[0]
 
+		if @loggedin
+			# Already logged in, need to log out before logging in again.
+			console.log "Already logged in."
+			doneCallback null
+			return
+
 		async.waterfall [
 			(callback) =>
 				if name
