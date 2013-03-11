@@ -1,0 +1,177 @@
+<!DOCTYPE html>  <html> <head>   <title>menu.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               menu.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p>Menu system for the client.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">crypto = </span><span class="nx">require</span> <span class="s">&#39;crypto&#39;</span>
+<span class="nv">async = </span><span class="nx">require</span> <span class="s">&#39;async&#39;</span>
+<span class="nv">Encryption = </span><span class="nx">require</span> <span class="s">&#39;./encryption&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <h2>getLine</h2>
+
+<p>Gets the current line from the terminal and calls <code>callback</code> when done. <br />
+<code>callback(line)</code> - Called when the user is done typing a line.
+<code>line</code> - The line that was input.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">getLine = </span><span class="nf">(callback) -&gt;</span>
+  <span class="nx">process</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">resume</span><span class="p">()</span>
+  <span class="nx">process</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">setEncoding</span> <span class="s">&#39;utf8&#39;</span>
+  <span class="nx">process</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">once</span> <span class="s">&#39;data&#39;</span><span class="p">,</span> <span class="nf">(line) -&gt;</span>
+    <span class="nx">process</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">pause</span><span class="p">()</span>
+    <span class="nx">callback</span> <span class="nx">line</span><span class="p">.</span><span class="nx">trim</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <h1>Menu</h1>
+
+<p>Runs and operates the menu (command prompt).</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">Menu</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <h2>constructor</h2>
+
+<p><code>con</code> - Connection object with the server. <br />
+<code>key</code> - The key used for encryption with the server. <br />
+<code>server</code> - The name of the server.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">constructor: </span><span class="nf">(@con, @key, @server) -&gt;</span>
+    <span class="vi">@user = </span><span class="s">&quot;[anonymous]&quot;</span>
+    <span class="vi">@loggedin = </span><span class="kc">false</span>
+    <span class="vi">@enc = </span><span class="k">new</span> <span class="nx">Encryption</span> <span class="nx">@key</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <h2>start</h2>
+
+<p>Take over the interface and start listening for data.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">start: </span><span class="o">=&gt;</span>
+    <span class="nx">@prompt</span><span class="p">()</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <h2>prompt</h2>
+
+<p>Prompt the user for the next command and execute that command.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">prompt: </span><span class="o">=&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>Set to false when the prompt should not run again in the
+next command.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">again = </span><span class="kc">true</span>
+
+    <span class="nx">async</span><span class="p">.</span><span class="nx">waterfall</span> <span class="p">[</span>
+      <span class="nf">(callback) =&gt;</span>
+        <span class="nx">process</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">@user</span><span class="si">}</span><span class="s">@</span><span class="si">#{</span><span class="nx">@server</span><span class="si">}</span><span class="s">$ &quot;</span>
+        <span class="nx">getLine</span> <span class="nf">(line) -&gt;</span>
+          <span class="nx">callback</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">line</span>
+      <span class="nf">(line, callback) =&gt;</span>
+        <span class="nx">@processInput</span> <span class="nx">line</span><span class="p">,</span> <span class="nf">(stop) =&gt;</span>
+          <span class="k">if</span> <span class="nx">stop</span> <span class="k">then</span> <span class="nv">again = </span><span class="kc">false</span>
+          <span class="nx">callback</span> <span class="kc">null</span>
+      <span class="nf">(callback) =&gt;</span>
+        <span class="nx">@prompt</span><span class="p">()</span> <span class="k">if</span> <span class="nx">again</span>
+        <span class="nx">callback</span> <span class="kc">null</span>
+    <span class="p">]</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <h2>processInput</h2>
+
+<p>Process the data entered and send it to the functions to process it.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">processInput: </span><span class="nf">(input, doneProcessing) =&gt;</span>
+    <span class="nv">args = </span><span class="nx">input</span><span class="p">.</span><span class="nx">split</span> <span class="s">&#39; &#39;</span>
+    <span class="k">for</span> <span class="nx">arg</span> <span class="k">in</span> <span class="nx">args</span>
+      <span class="nv">arg = </span><span class="nx">arg</span><span class="p">.</span><span class="nx">trim</span><span class="p">()</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>Remove empty arguments</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nx">args</span><span class="p">.</span><span class="nx">splice</span> <span class="nx">index</span><span class="p">,</span> <span class="mi">1</span> <span class="k">for</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">value</span> <span class="k">of</span> <span class="nx">args</span> <span class="k">when</span> <span class="o">not</span> <span class="nx">value</span>
+    
+    <span class="k">unless</span> <span class="nx">args</span><span class="p">.</span><span class="nx">length</span>
+      <span class="nx">doneProcessing</span><span class="p">()</span>
+      <span class="k">return</span>
+    
+    <span class="k">switch</span> <span class="nx">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="k">when</span> <span class="s">&quot;exit&quot;</span>
+        <span class="nx">@con</span><span class="p">.</span><span class="nx">end</span><span class="p">()</span>
+        <span class="nx">doneProcessing</span> <span class="kc">true</span>
+      <span class="k">when</span> <span class="s">&quot;help&quot;</span>
+        <span class="nx">@printHelp</span><span class="p">()</span>
+        <span class="nx">doneProcessing</span><span class="p">()</span>
+      <span class="k">when</span> <span class="s">&quot;login&quot;</span> <span class="k">then</span> <span class="nx">@login</span> <span class="nx">doneProcessing</span><span class="p">,</span> <span class="nx">args</span><span class="p">[</span><span class="mi">1</span><span class="p">..]</span>
+      <span class="k">when</span> <span class="s">&quot;logout&quot;</span> <span class="k">then</span> <span class="nx">@logout</span> <span class="nx">doneProcessing</span><span class="p">,</span> <span class="nx">args</span><span class="p">[</span><span class="mi">1</span><span class="p">..]</span>
+      <span class="k">else</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s">&quot;Unknown command. For help type &#39;help&#39;&quot;</span>
+        <span class="nx">doneProcessing</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <h1>Input Commands</h1>
+
+<p>The following commands represent the various functions the user can
+call.</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <h2>printHelp</h2>
+
+<p>Displays the help message to the user. <br />
+Usage: <code>help</code></p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">printHelp: </span><span class="o">=&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="s">      Commands:</span>
+<span class="s">      exit - Exit the prompt and disconnect.</span>
+<span class="s">      login - Login to the server.</span>
+<span class="s">      logout - Logout of the server but maintain connection.</span>
+<span class="s">      createuser - Creates a new user account.</span>
+<span class="s">      help - Prints this help page.</span>
+<span class="s">      &quot;&quot;&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <h2>createUser</h2>
+
+<p>Creates a new user on the server. <br />
+Usage: <code>createuser name</code></p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">createUser: </span><span class="o">=&gt;</span>
+    <span class="nv">name = </span><span class="kc">null</span>
+    <span class="nv">password = </span><span class="kc">null</span>
+
+    <span class="nx">async</span><span class="p">.</span><span class="nx">waterfall</span> <span class="p">[</span>
+      <span class="nf">(callback) =&gt;</span>
+        <span class="nx">process</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">write</span> <span class="s">&quot;Username: &quot;</span>
+        <span class="nx">getLine</span> <span class="nf">(line) =&gt;</span>
+          <span class="nv">name = </span><span class="nx">line</span>
+          <span class="nx">callback</span> <span class="kc">null</span>
+      <span class="nf">(callback) =&gt;</span>
+        <span class="nx">process</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">write</span> <span class="s">&quot;Password: &quot;</span>
+        <span class="nx">getLine</span> <span class="nf">(line) =&gt;</span>
+          <span class="nv">password = </span><span class="nx">line</span>
+          <span class="nx">callback</span> <span class="kc">null</span>
+      <span class="nf">(callback) =&gt;</span>
+        <span class="nx">callback</span> <span class="kc">null</span>
+        
+    <span class="p">]</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-13">&#182;</a>               </div>               <h2>login</h2>
+
+<p>Logs the user into the server. <br />
+Usage: <code>login [name]</code></p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">login: </span><span class="nf">(doneCallback, args) =&gt;</span>
+    <span class="nv">name = </span><span class="kc">null</span>
+    <span class="nv">password = </span><span class="kc">null</span>
+    <span class="nv">passwordHash = </span><span class="kc">null</span>
+
+    <span class="k">if</span> <span class="nx">args</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;=</span> <span class="mi">1</span>
+      <span class="nv">name = </span><span class="nx">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nx">@loggedin</span></pre></div>             </td>           </tr>                               <tr id="section-14">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-14">&#182;</a>               </div>               <p>Already logged in, need to log out before logging in again.</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s">&quot;Already logged in.&quot;</span>
+      <span class="nx">doneCallback</span> <span class="kc">null</span>
+      <span class="k">return</span>
+
+    <span class="nx">async</span><span class="p">.</span><span class="nx">waterfall</span> <span class="p">[</span>
+      <span class="nf">(callback) =&gt;</span>
+        <span class="k">if</span> <span class="nx">name</span>
+          <span class="nx">callback</span> <span class="kc">null</span>
+        <span class="k">else</span>
+          <span class="nx">process</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">write</span> <span class="s">&quot;Username: &quot;</span>
+          <span class="nx">getLine</span> <span class="nf">(line) =&gt;</span>
+            <span class="nv">name = </span><span class="nx">line</span>
+            <span class="nx">callback</span> <span class="kc">null</span>
+      <span class="nf">(callback) =&gt;</span>
+        <span class="nx">process</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">write</span> <span class="s">&quot;Password: &quot;</span>
+        <span class="nx">getLine</span> <span class="nf">(line) =&gt;</span>
+          <span class="nv">password = </span><span class="nx">line</span>
+          <span class="nx">callback</span> <span class="kc">null</span>
+      <span class="nf">(callback) =&gt;</span>
+        <span class="nv">hash = </span><span class="nx">crypto</span><span class="p">.</span><span class="nx">createHash</span> <span class="s">&quot;sha512&quot;</span>
+        <span class="nx">hash</span><span class="p">.</span><span class="nx">update</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">name</span><span class="si">}#{</span><span class="nx">password</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span>
+        <span class="nv">passwordHash = </span><span class="nx">hash</span><span class="p">.</span><span class="nx">digest</span> <span class="s">&#39;base64&#39;</span>
+        <span class="nv">logindata = </span><span class="p">{}</span>
+        <span class="nv">logindata.command = </span><span class="s">&quot;login&quot;</span>
+        <span class="nv">logindata.user = </span><span class="nx">name</span>
+        <span class="nv">logindata.password = </span><span class="nx">passwordHash</span>
+        <span class="nx">@con</span><span class="p">.</span><span class="nx">write</span> <span class="nx">@enc</span><span class="p">.</span><span class="nx">encObj</span> <span class="nx">logindata</span>
+        <span class="nx">@con</span><span class="p">.</span><span class="nx">once</span> <span class="s">&#39;data&#39;</span><span class="p">,</span> <span class="nf">(data) =&gt;</span>
+          <span class="nv">response = </span><span class="nx">@enc</span><span class="p">.</span><span class="nx">decObj</span> <span class="nx">data</span>
+          <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">success</span>
+            <span class="vi">@user = </span><span class="nx">name</span>
+            <span class="vi">@loggedin = </span><span class="kc">true</span>
+          <span class="k">else</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">error</span> <span class="s">&quot;Login failed.&quot;</span>
+          
+          <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">message</span><span class="o">?</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="nx">response</span><span class="p">.</span><span class="nx">message</span>
+
+          <span class="nx">callback</span> <span class="kc">null</span>
+      <span class="nf">(callback) =&gt;</span>
+        <span class="nx">doneCallback</span> <span class="kc">null</span>
+        <span class="nx">callback</span> <span class="kc">null</span>
+    <span class="p">]</span></pre></div>             </td>           </tr>                               <tr id="section-15">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-15">&#182;</a>               </div>               <h2>logout</h2>
+
+<p>Logs the user out of the server. <br />
+Usage: <code>logout</code></p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">logout: </span><span class="nf">(doneCallback, args) =&gt;</span>
+    <span class="k">if</span> <span class="nx">@loggedin</span></pre></div>             </td>           </tr>                               <tr id="section-16">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-16">&#182;</a>               </div>               <p>Send a logout command to the server</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="nx">@con</span><span class="p">.</span><span class="nx">write</span> <span class="nx">@enc</span><span class="p">.</span><span class="nx">encObj</span> <span class="p">{</span><span class="nv">command: </span><span class="s">&quot;logout&quot;</span><span class="p">}</span>
+      <span class="nx">@con</span><span class="p">.</span><span class="nx">once</span> <span class="s">&#39;data&#39;</span><span class="p">,</span> <span class="nf">(data) =&gt;</span>
+        <span class="nv">response = </span><span class="nx">@enc</span><span class="p">.</span><span class="nx">decObj</span> <span class="nx">data</span>
+        <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">success</span>
+          <span class="vi">@loggedin = </span><span class="kc">false</span>
+          <span class="vi">@user = </span><span class="s">&quot;[anonymous]&quot;</span>
+        <span class="k">else</span>
+          <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="nx">response</span><span class="p">.</span><span class="nx">message</span>
+        <span class="nx">doneCallback</span><span class="p">()</span>
+
+    <span class="k">else</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s">&quot;Not currently logged in.&quot;</span>
+
+
+
+<span class="nv">module.exports = </span><span class="nx">Menu</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

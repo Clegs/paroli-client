@@ -1,7 +1,5 @@
-###
-	start.coffee - Starts a sample client to interact with the paroli server
-	and test its features.
-###
+# Starts a sample client to interact with the paroli server
+# and test its features.
 
 net = require 'net'
 ursa = require 'ursa'
@@ -10,8 +8,12 @@ crypto = require 'crypto'
 
 Menu = require './menu'
 
+# getLine
+# -------
 # Get the next line from the console and call 'callback' with the line
-# as the argument.
+# as the argument.  
+# `callback(line)` - Called when the user has typed in the line.  
+# `line` - Trimmed line with whitespace removed.
 getLine = (callback) ->
 	process.stdin.resume()
 	process.stdin.setEncoding 'utf8'
@@ -19,18 +21,29 @@ getLine = (callback) ->
 		process.stdin.pause()
 		callback line.trim()
 
-# Get the next data from the connection 'con'
+# getData
+# -------
+# Get the next data from the connection `con`.
+# `con` - The connection.
+# `callback(data)` - Called when the data is received.  
+# `data` - The data that has been received.  
+# `encoding` - The endocing of the data to receive.
 getData = (con, callback, encoding) ->
 	con.setEncoding encoding if encoding
 	con.once 'data', (data) ->
 		callback data
 
+# Default values
 server = "localhost"
 port = 6743
 con = null
 publicKey = null
 key = null
 
+# sendEnc
+# -------
+# Sends encoded data to the server.  
+# `data` - The data to send to the server.
 sendEnc = (data) ->
 	cipher = crypto.createCipher 'aes256', key
 	buf1 = new Buffer cipher.update(data), 'binary'

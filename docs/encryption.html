@@ -1,0 +1,39 @@
+<!DOCTYPE html>  <html> <head>   <title>encryption.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               encryption.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p>In charge of encrypting and decrypting the data
+being sent to the user and being stored on the disk.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">crypto = </span><span class="nx">require</span> <span class="s">&#39;crypto&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <h1>Encryption</h1>
+
+<p>Handles the encryption and decription of data between the server and
+the client.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">Encryption</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <h2>constructor</h2>
+
+<p>Creates the encryption object. <br />
+<code>key</code> - The passphrase being used for the encryption. Normally sent
+to the server from the client.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">constructor: </span><span class="nf">(@key, @privateKey) -&gt;</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <h2>encode</h2>
+
+<p>Encode data using the key to be sent to the user. <br />
+<code>data</code> - The data to encode. <br />
+Returns the encoded data in base64.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">encode: </span><span class="nf">(data) =&gt;</span>
+    <span class="nv">cipher = </span><span class="nx">crypto</span><span class="p">.</span><span class="nx">createCipher</span> <span class="s">&#39;aes256&#39;</span><span class="p">,</span> <span class="nx">@key</span>
+    <span class="nx">cipher</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span><span class="p">,</span> <span class="s">&#39;base64&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="nx">cipher</span><span class="p">.</span><span class="nx">final</span><span class="p">(</span><span class="s">&#39;base64&#39;</span><span class="p">)</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <h2>decode</h2>
+
+<p>Decodes the data that has been encoded using the <code>encode</code> method. <br />
+<code>data</code> - The data to decode.
+Returns the decoded data as a string.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">decode: </span><span class="nf">(data) =&gt;</span>
+    <span class="nv">decipher = </span><span class="nx">crypto</span><span class="p">.</span><span class="nx">createDecipher</span> <span class="s">&#39;aes256&#39;</span><span class="p">,</span> <span class="nx">@key</span>
+    <span class="s">&quot;</span><span class="si">#{</span><span class="nx">decipher</span><span class="p">.</span><span class="nx">update</span> <span class="nx">data</span><span class="p">,</span> <span class="s">&#39;base64&#39;</span><span class="si">}#{</span><span class="nx">decipher</span><span class="p">.</span><span class="nx">final</span><span class="p">()</span><span class="si">}</span><span class="s">&quot;</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <h2>encObj</h2>
+
+<p>Encodes an object. <br />
+<code>obj</code> - Object to be encoded. <br />
+Returns the encoded object in base64.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">encObj: </span><span class="nf">(obj) =&gt;</span>
+    <span class="nx">@encode</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">obj</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <h2>decObj</h2>
+
+<p>Decodes encoded data into an object. <br />
+<code>data</code> - base64 data to decode. <br />
+Returns an object represented by the encoded data.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">decObj: </span><span class="nf">(data) =&gt;</span>
+    <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">@decode</span> <span class="nx">data</span>
+
+<span class="nv">module.exports = </span><span class="nx">Encryption</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
